@@ -16,11 +16,11 @@ ALLOWED_HOSTS = os.getenv(
     f"localhost,127.0.0.1,{DEFAULT_IP}"
 ).split(",")
 
-# Add your domain to the env var when you have one
 CSRF_TRUSTED_ORIGINS = os.getenv(
     "CSRF_TRUSTED_ORIGINS",
-    f"http://localhost:8000,http://127.0.0.1:8000,http://{DEFAULT_IP}"
+    "http://localhost:8000,http://127.0.0.1:8000,http://167.71.37.168:8000"
 ).split(",")
+
 
 # -------- Apps
 INSTALLED_APPS = [
