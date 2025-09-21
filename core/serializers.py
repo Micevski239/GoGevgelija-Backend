@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Item, Listing
+from .models import Item, Listing, Event, Promotion
 
 class ItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -14,6 +14,22 @@ class ListingSerializer(serializers.ModelSerializer):
             "id", "title", "rating", "address", "open_time", 
             "category", "tags", "image", "featured", 
             "created_at", "updated_at"
+        ]
+
+class EventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Event
+        fields = [
+            "id", "title", "description", "date_time", "location", 
+            "cover_image", "featured", "created_at", "updated_at"
+        ]
+
+class PromotionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Promotion
+        fields = [
+            "id", "title", "description", "discount_code", "tags", 
+            "image", "valid_until", "featured", "created_at", "updated_at"
         ]
 
 class UserSerializer(serializers.ModelSerializer):

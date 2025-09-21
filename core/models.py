@@ -39,3 +39,38 @@ class Listing(models.Model):
     
     def __str__(self):
         return self.title
+
+
+class Event(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, help_text="Event description")
+    date_time = models.CharField(max_length=100, help_text="e.g., 'Fri, 20:00' or 'Dec 25, 18:00'")
+    location = models.CharField(max_length=255, help_text="Event venue/location")
+    cover_image = models.URLField(max_length=1000, help_text="URL to the event cover image")
+    featured = models.BooleanField(default=False, help_text="Show in featured events")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.title} - {self.date_time}"
+
+
+class Promotion(models.Model):
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True, help_text="Promotion description")
+    discount_code = models.CharField(max_length=50, help_text="Promo code for discount")
+    tags = models.JSONField(default=list, help_text="List of tags, e.g., ['Today', 'Dine-in', '50% off']")
+    image = models.URLField(max_length=1000, help_text="URL to the promotion image")
+    valid_until = models.DateField(null=True, blank=True, help_text="Promotion expiry date")
+    featured = models.BooleanField(default=False, help_text="Show in featured promotions")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.title} - {self.discount_code}"

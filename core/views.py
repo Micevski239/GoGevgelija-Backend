@@ -4,8 +4,8 @@ from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Item, Listing
-from .serializers import ItemSerializer, ListingSerializer, UserSerializer
+from .models import Item, Listing, Event, Promotion
+from .serializers import ItemSerializer, ListingSerializer, EventSerializer, PromotionSerializer, UserSerializer
 
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all().order_by("-created_at")
@@ -22,6 +22,30 @@ class ListingViewSet(viewsets.ModelViewSet):
         """Get only featured listings"""
         featured_listings = Listing.objects.filter(featured=True)
         serializer = self.get_serializer(featured_listings, many=True)
+        return Response(serializer.data)
+
+class EventViewSet(viewsets.ModelViewSet):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+    permission_classes = [permissions.AllowAny]
+    
+    @action(detail=False, methods=['get'])
+    def featured(self, request):
+        """Get only featured events"""
+        featured_events = Event.objects.filter(featured=True)
+        serializer = self.get_serializer(featured_events, many=True)
+        return Response(serializer.data)
+
+class PromotionViewSet(viewsets.ModelViewSet):
+    queryset = Promotion.objects.all()
+    serializer_class = PromotionSerializer
+    permission_classes = [permissions.AllowAny]
+    
+    @action(detail=False, methods=['get'])
+    def featured(self, request):
+        """Get only featured promotions"""
+        featured_promotions = Promotion.objects.filter(featured=True)
+        serializer = self.get_serializer(featured_promotions, many=True)
         return Response(serializer.data)
 
 @api_view(["GET"])
