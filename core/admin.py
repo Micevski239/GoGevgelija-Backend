@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Item, Listing, Event, Promotion
+from .models import Item, Listing, Event, Promotion, Blog
 
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
@@ -29,3 +29,12 @@ class PromotionAdmin(admin.ModelAdmin):
     search_fields = ('title', 'discount_code', 'description')
     list_editable = ('featured',)
     ordering = ('-created_at',)
+
+@admin.register(Blog)
+class BlogAdmin(admin.ModelAdmin):
+    list_display = ('title', 'author', 'category', 'read_time_minutes', 'featured', 'published', 'created_at')
+    list_filter = ('category', 'featured', 'published', 'created_at')
+    search_fields = ('title', 'subtitle', 'content', 'author', 'category')
+    list_editable = ('featured', 'published')
+    ordering = ('-created_at',)
+    readonly_fields = ('created_at', 'updated_at')
