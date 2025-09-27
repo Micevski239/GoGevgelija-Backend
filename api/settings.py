@@ -21,11 +21,6 @@ CSRF_TRUSTED_ORIGINS = os.getenv(
     "http://localhost:8000,http://127.0.0.1:8000,http://167.71.37.168:8000"
 ).split(",")
 
-import os, dj_database_url
-db_url = os.getenv("DATABASE_URL")
-if not db_url:
-    raise RuntimeError("DATABASE_URL is missing")  # prevent accidental SQLite
-DATABASES = {"default": dj_database_url.parse(db_url, conn_max_age=600)}
 
 
 
