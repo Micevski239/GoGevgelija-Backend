@@ -1,5 +1,9 @@
 from django.contrib import admin
-from .models import Item, Listing, Event, Promotion, Blog
+from .models import Item, Listing, Event, Promotion, Blog, test
+
+@admin.register(test)
+class testAdmib(admin.ModelAdmin):
+    list_display = ('title',)
 
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
