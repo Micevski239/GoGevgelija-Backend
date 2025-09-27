@@ -4,8 +4,8 @@ from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Item, Listing, Event, Promotion
-from .serializers import ItemSerializer, ListingSerializer, EventSerializer, PromotionSerializer, UserSerializer
+from .models import Item, Listing, Event, Promotion, Blog
+from .serializers import ItemSerializer, ListingSerializer, EventSerializer, PromotionSerializer, BlogSerializer, UserSerializer
 
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all().order_by("-created_at")
@@ -46,6 +46,18 @@ class PromotionViewSet(viewsets.ModelViewSet):
         """Get only featured promotions"""
         featured_promotions = Promotion.objects.filter(featured=True)
         serializer = self.get_serializer(featured_promotions, many=True)
+        return Response(serializer.data)
+
+class BlogViewSet(viewsets.ModelViewSet):
+    queryset = Blog.objects.filter(published=True)
+    serializer_class = BlogSerializer
+    permission_classes = [permissions.AllowAny]
+    
+    @action(detail=False, methods=['get'])
+    def featured(self, request):
+        """Get only featured blogs"""
+        featured_blogs = Blog.objects.filter(featured=True, published=True)
+        serializer = self.get_serializer(featured_blogs, many=True)
         return Response(serializer.data)
 
 @api_view(["GET"])

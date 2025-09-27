@@ -74,3 +74,35 @@ class Promotion(models.Model):
     
     def __str__(self):
         return f"{self.title} - {self.discount_code}"
+
+
+class Blog(models.Model):
+    CATEGORY_CHOICES = [
+        ('guide', 'Travel Guide'),
+        ('food', 'Food & Dining'),
+        ('culture', 'Culture & History'),
+        ('events', 'Events & Activities'),
+        ('tips', 'Travel Tips'),
+        ('news', 'Local News'),
+        ('lifestyle', 'Lifestyle'),
+        ('other', 'Other'),
+    ]
+    
+    title = models.CharField(max_length=255)
+    subtitle = models.CharField(max_length=500, blank=True, help_text="Brief subtitle or summary")
+    content = models.TextField(help_text="Full blog post content")
+    author = models.CharField(max_length=100, default="GoGevgelija Team")
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='other')
+    tags = models.JSONField(default=list, help_text="List of tags, e.g., ['Travel', 'Food', 'Culture']")
+    cover_image = models.URLField(max_length=1000, help_text="URL to the blog cover image")
+    read_time_minutes = models.PositiveIntegerField(default=5, help_text="Estimated reading time in minutes")
+    featured = models.BooleanField(default=False, help_text="Show in featured blogs")
+    published = models.BooleanField(default=True, help_text="Whether the blog is published")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return self.title
