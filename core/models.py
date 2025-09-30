@@ -6,6 +6,19 @@ class Item(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     def __str__(self): return self.name
 
+class Category(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    icon = models.CharField(max_length=50, help_text="Ionicon name (e.g., 'restaurant-outline')")
+    trending = models.BooleanField(default=False, help_text="Show as trending category")
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name_plural = "Categories"
+        ordering = ['name']
+    
+    def __str__(self):
+        return self.name
+
 class Listing(models.Model):
     CATEGORY_CHOICES = [
         ('restaurant', 'Restaurant'),

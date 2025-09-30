@@ -1,11 +1,16 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Item, Listing, Event, Promotion, Blog
+from .models import Item, Category, Listing, Event, Promotion, Blog
 
 class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
         fields = ["id","name","created_at"]
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ["id", "name", "icon", "trending", "created_at"]
 
 class ListingSerializer(serializers.ModelSerializer):
     class Meta:

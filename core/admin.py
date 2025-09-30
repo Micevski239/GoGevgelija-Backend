@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Item, Listing, Event, Promotion, Blog, test
+from .models import Item, Category, Listing, Event, Promotion, Blog, test
 
 @admin.register(test)
 class testAdmib(admin.ModelAdmin):
@@ -9,6 +9,14 @@ class testAdmib(admin.ModelAdmin):
 class ItemAdmin(admin.ModelAdmin):
     list_display = ('name', 'created_at')
     search_fields = ('name',)
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('name', 'icon', 'trending', 'created_at')
+    list_filter = ('trending', 'created_at')
+    search_fields = ('name', 'icon')
+    list_editable = ('trending',)
+    ordering = ('name',)
 
 @admin.register(Listing)
 class ListingAdmin(admin.ModelAdmin):

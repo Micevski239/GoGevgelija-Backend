@@ -4,12 +4,17 @@ from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Item, Listing, Event, Promotion, Blog
-from .serializers import ItemSerializer, ListingSerializer, EventSerializer, PromotionSerializer, BlogSerializer, UserSerializer
+from .models import Item, Category, Listing, Event, Promotion, Blog
+from .serializers import ItemSerializer, CategorySerializer, ListingSerializer, EventSerializer, PromotionSerializer, BlogSerializer, UserSerializer
 
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all().order_by("-created_at")
     serializer_class = ItemSerializer
+    permission_classes = [permissions.AllowAny]
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
     permission_classes = [permissions.AllowAny]
 
 class ListingViewSet(viewsets.ModelViewSet):
