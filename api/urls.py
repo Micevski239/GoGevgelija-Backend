@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from core.views import ItemViewSet, CategoryViewSet, ListingViewSet, EventViewSet, PromotionViewSet, BlogViewSet, health, Register, Me
+from core.views import ItemViewSet, CategoryViewSet, ListingViewSet, EventViewSet, PromotionViewSet, BlogViewSet, WishlistViewSet, health, Register, Me
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 router = DefaultRouter()
@@ -11,6 +11,7 @@ router.register(r"listings", ListingViewSet, basename="listing")
 router.register(r"events", EventViewSet, basename="event")
 router.register(r"promotions", PromotionViewSet, basename="promotion")
 router.register(r"blogs", BlogViewSet, basename="blog")
+router.register(r"wishlist", WishlistViewSet, basename="wishlist")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
