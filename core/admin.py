@@ -20,7 +20,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Listing)
 class ListingAdmin(admin.ModelAdmin):
-    list_display = ('title', 'category', 'rating', 'featured', 'created_at')
+    list_display = ('title', 'category', 'rating', 'featured', 'created_at', 'phone_number', 'facebook_url', 'instagram_url', 'website_url')
     list_filter = ('category', 'featured', 'created_at')
     search_fields = ('title', 'address', 'category')
     list_editable = ('featured',)
