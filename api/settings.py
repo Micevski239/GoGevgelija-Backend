@@ -9,18 +9,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-only-do-not-use-in-prod")
 DEBUG = os.getenv("DJANGO_DEBUG", "0") == "1"
 
-# -------- Hosts and CSRF
 DEFAULT_IP = "167.71.37.168"
+
 ALLOWED_HOSTS = os.getenv(
     "ALLOWED_HOSTS",
-    f"localhost,127.0.0.1,{DEFAULT_IP}"
+    f"localhost,127.0.0.1,{DEFAULT_IP},gogevgelija.com,www.gogevgelija.com"
 ).split(",")
 
 CSRF_TRUSTED_ORIGINS = os.getenv(
     "CSRF_TRUSTED_ORIGINS",
-    "http://localhost:8000,http://127.0.0.1:8000,http://167.71.37.168:8000"
+    "https://gogevgelija.com,https://www.gogevgelija.com,http://167.71.37.168"
 ).split(",")
-
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 
 
 
