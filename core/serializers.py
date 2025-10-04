@@ -18,8 +18,9 @@ class ListingSerializer(serializers.ModelSerializer):
         model = Listing
         fields = [
             "id", "title", "rating", "address", "open_time", 
-            "category", "tags", "image", "featured", 
-            "created_at", "updated_at"
+            "category", "tags", "image", "phone_number", 
+            "facebook_url", "instagram_url", "website_url", 
+            "featured", "created_at", "updated_at"
         ]
 
 class EventSerializer(serializers.ModelSerializer):
