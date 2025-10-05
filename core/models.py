@@ -102,6 +102,10 @@ class Promotion(models.Model):
     image = models.URLField(max_length=1000, help_text="URL to the promotion image")
     valid_until = models.DateField(null=True, blank=True, help_text="Promotion expiry date")
     featured = models.BooleanField(default=False, help_text="Show in featured promotions")
+    website = models.URLField(max_length=500, blank=True, help_text="Website URL")
+    facebook_url = models.URLField(max_length=500, blank=True, help_text="Facebook page URL")
+    instagram_url = models.URLField(max_length=500, blank=True, help_text="Instagram profile URL")
+    address = models.CharField(max_length=500, blank=True, help_text="Physical address")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
