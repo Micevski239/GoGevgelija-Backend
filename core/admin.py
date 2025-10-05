@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Item, Category, Listing, Event, Promotion, Blog, test, Wishlist
+from .models import Item, Category, Listing, Event, Promotion, Blog, test, EventJoin, Wishlist
 
 @admin.register(test)
 class testAdmib(admin.ModelAdmin):
@@ -50,6 +50,14 @@ class BlogAdmin(admin.ModelAdmin):
     list_editable = ('featured', 'published')
     ordering = ('-created_at',)
     readonly_fields = ('created_at', 'updated_at')
+
+@admin.register(EventJoin)
+class EventJoinAdmin(admin.ModelAdmin):
+    list_display = ('user', 'event', 'created_at')
+    list_filter = ('created_at', 'event')
+    search_fields = ('user__username', 'user__email', 'event__title')
+    ordering = ('-created_at',)
+    readonly_fields = ('created_at',)
 
 @admin.register(Wishlist)
 class WishlistAdmin(admin.ModelAdmin):

@@ -149,6 +149,21 @@ class test(models.Model):
         return self.title
 
 
+class EventJoin(models.Model):
+    """
+    Track which users have joined which events.
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='event_joins')
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='joined_users')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        unique_together = ('user', 'event')
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.user.username} joined {self.event.title}"
+
 class Wishlist(models.Model):
     """
     Generic wishlist model that can store any type of content (Listing, Event, Promotion)

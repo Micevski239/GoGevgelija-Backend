@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Item, Category, Listing, Event, Promotion, Blog, Wishlist
+from .models import Item, Category, Listing, Event, Promotion, Blog, EventJoin, Wishlist
 from .serializers import ItemSerializer, CategorySerializer, ListingSerializer, EventSerializer, PromotionSerializer, BlogSerializer, UserSerializer, WishlistSerializer, WishlistCreateSerializer
 
 class ItemViewSet(viewsets.ModelViewSet):
@@ -42,12 +42,25 @@ class EventViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(featured_events, many=True)
         return Response(serializer.data)
     
-    @action(detail=True, methods=['post'], permission_classes=[permissions.AllowAny])
+    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
     def join(self, request, pk=None):
-        """Join an event (increment join count)"""
+        """Join an event (only once per user)"""
         event = self.get_object()
-        event.join_count += 1
+        user = request.user
+        
+        # Check if user already joined this event
+        if EventJoin.objects.filter(user=user, event=event).exists():
+            return Response({
+                'error': 'You have already joined this event.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create the join record
+        EventJoin.objects.create(user=user, event=event)
+        
+        # Update the join count
+        event.join_count = event.joined_users.count()
         event.save()
+        
         serializer = self.get_serializer(event)
         return Response({
             'message': 'Successfully joined the event!',

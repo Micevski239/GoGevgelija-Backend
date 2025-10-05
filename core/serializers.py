@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from .models import Item, Category, Listing, Event, Promotion, Blog, Wishlist
+from .models import Item, Category, Listing, Event, Promotion, Blog, EventJoin, Wishlist
 
 class ItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,13 +24,22 @@ class ListingSerializer(serializers.ModelSerializer):
         ]
 
 class EventSerializer(serializers.ModelSerializer):
+    has_joined = serializers.SerializerMethodField()
+    
     class Meta:
         model = Event
         fields = [
             "id", "title", "description", "date_time", "location", 
             "cover_image", "entry_price", "category", "age_limit", "expectations", 
-            "join_count", "featured", "created_at", "updated_at"
+            "join_count", "has_joined", "featured", "created_at", "updated_at"
         ]
+    
+    def get_has_joined(self, obj):
+        """Check if the current user has joined this event."""
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return EventJoin.objects.filter(user=request.user, event=obj).exists()
+        return False
 
 class PromotionSerializer(serializers.ModelSerializer):
     class Meta:
