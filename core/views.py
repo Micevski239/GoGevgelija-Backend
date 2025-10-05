@@ -187,11 +187,12 @@ class WishlistViewSet(viewsets.ModelViewSet):
             'listing': Listing,
             'event': Event,
             'promotion': Promotion,
+            'blog': Blog,
         }
         
         if item_type not in model_mapping:
             return Response(
-                {"error": "Invalid item_type. Must be 'listing', 'event', or 'promotion'."},
+                {"error": "Invalid item_type. Must be 'listing', 'event', 'promotion', or 'blog'."},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
@@ -229,11 +230,12 @@ class WishlistViewSet(viewsets.ModelViewSet):
             'listing': Listing,
             'event': Event,
             'promotion': Promotion,
+            'blog': Blog,
         }
         
         if item_type not in model_mapping:
             return Response(
-                {"error": "Invalid item_type. Must be 'listing', 'event', or 'promotion'."},
+                {"error": "Invalid item_type. Must be 'listing', 'event', 'promotion', or 'blog'."},
                 status=status.HTTP_400_BAD_REQUEST
             )
         

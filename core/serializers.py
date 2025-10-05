@@ -87,11 +87,13 @@ class WishlistSerializer(serializers.ModelSerializer):
             return EventSerializer(content_object).data
         elif isinstance(content_object, Promotion):
             return PromotionSerializer(content_object).data
+        elif isinstance(content_object, Blog):
+            return BlogSerializer(content_object).data
         return None
 
 class WishlistCreateSerializer(serializers.Serializer):
     """Serializer for creating wishlist items."""
-    item_type = serializers.ChoiceField(choices=['listing', 'event', 'promotion'])
+    item_type = serializers.ChoiceField(choices=['listing', 'event', 'promotion', 'blog'])
     item_id = serializers.IntegerField()
     
     def create(self, validated_data):
@@ -104,6 +106,7 @@ class WishlistCreateSerializer(serializers.Serializer):
             'listing': Listing,
             'event': Event,
             'promotion': Promotion,
+            'blog': Blog,
         }
         
         model_class = model_mapping[item_type]
