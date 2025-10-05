@@ -82,6 +82,7 @@ class Event(models.Model):
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='other')
     age_limit = models.CharField(max_length=50, default="All ages welcome", help_text="Age restriction (e.g., 'All ages welcome', '18+', '21+')")
     expectations = models.JSONField(default=list, help_text="List of expectations with icons, e.g., [{'icon': 'musical-notes', 'text': 'Live entertainment'}, {'icon': 'restaurant', 'text': 'Food available'}]")
+    join_count = models.PositiveIntegerField(default=0, help_text="Number of users who joined this event")
     featured = models.BooleanField(default=False, help_text="Show in featured events")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

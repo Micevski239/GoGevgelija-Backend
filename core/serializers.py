@@ -29,7 +29,7 @@ class EventSerializer(serializers.ModelSerializer):
         fields = [
             "id", "title", "description", "date_time", "location", 
             "cover_image", "entry_price", "category", "age_limit", "expectations", 
-            "featured", "created_at", "updated_at"
+            "join_count", "featured", "created_at", "updated_at"
         ]
 
 class PromotionSerializer(serializers.ModelSerializer):
