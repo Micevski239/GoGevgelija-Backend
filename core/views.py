@@ -42,28 +42,66 @@ class EventViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(featured_events, many=True)
         return Response(serializer.data)
     
-    @action(detail=True, methods=['post'], permission_classes=[permissions.IsAuthenticated])
+    @action(detail=True, methods=['post'], permission_classes=[permissions.AllowAny])
     def join(self, request, pk=None):
-        """Join an event (only once per user)"""
+        """Join an event with proper user tracking"""
         event = self.get_object()
-        user = request.user
         
-        # Check if user already joined this event
-        if EventJoin.objects.filter(user=user, event=event).exists():
-            return Response({
-                'error': 'You have already joined this event.'
-            }, status=status.HTTP_400_BAD_REQUEST)
-        
-        # Create the join record
-        EventJoin.objects.create(user=user, event=event)
-        
-        # Update the join count
-        event.join_count = event.joined_users.count()
-        event.save()
+        # Check if user is authenticated
+        if request.user.is_authenticated:
+            # Check if user already joined
+            existing_join = EventJoin.objects.filter(event=event, user=request.user).first()
+            if existing_join:
+                return Response({
+                    'error': 'You have already joined this event'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Create join record
+            EventJoin.objects.create(event=event, user=request.user)
+            
+            # Update join count
+            event.join_count = EventJoin.objects.filter(event=event).count()
+            event.save()
+        else:
+            # For non-authenticated users, just increment count
+            event.join_count += 1
+            event.save()
         
         serializer = self.get_serializer(event)
         return Response({
             'message': 'Successfully joined the event!',
+            'event': serializer.data
+        }, status=status.HTTP_200_OK)
+    
+    @action(detail=True, methods=['post'], permission_classes=[permissions.AllowAny])
+    def unjoin(self, request, pk=None):
+        """Unjoin an event (leave the event)"""
+        event = self.get_object()
+        
+        # Check if user is authenticated
+        if request.user.is_authenticated:
+            # Check if user has joined
+            existing_join = EventJoin.objects.filter(event=event, user=request.user).first()
+            if not existing_join:
+                return Response({
+                    'error': 'You have not joined this event'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Remove join record
+            existing_join.delete()
+            
+            # Update join count
+            event.join_count = EventJoin.objects.filter(event=event).count()
+            event.save()
+        else:
+            # For non-authenticated users, just decrement count (but not below 0)
+            if event.join_count > 0:
+                event.join_count -= 1
+                event.save()
+        
+        serializer = self.get_serializer(event)
+        return Response({
+            'message': 'Successfully left the event!',
             'event': serializer.data
         }, status=status.HTTP_200_OK)
 

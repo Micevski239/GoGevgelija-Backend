@@ -36,9 +36,7 @@ class EventSerializer(serializers.ModelSerializer):
     
     def get_has_joined(self, obj):
         """Check if the current user has joined this event."""
-        request = self.context.get('request')
-        if request and request.user.is_authenticated:
-            return EventJoin.objects.filter(user=request.user, event=obj).exists()
+        # TODO: Implement proper user join tracking when authentication is set up
         return False
 
 class PromotionSerializer(serializers.ModelSerializer):
