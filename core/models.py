@@ -97,7 +97,7 @@ class Event(models.Model):
 class Promotion(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, help_text="Promotion description")
-    discount_code = models.CharField(max_length=50, help_text="Promo code for discount")
+    discount_code = models.CharField(max_length=50, blank=True, help_text="Promo code for discount (leave empty if no code required)")
     tags = models.JSONField(default=list, help_text="List of tags, e.g., ['Today', 'Dine-in', '50% off']")
     image = models.URLField(max_length=1000, help_text="URL to the promotion image")
     valid_until = models.DateField(null=True, blank=True, help_text="Promotion expiry date")
