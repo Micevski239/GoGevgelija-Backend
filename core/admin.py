@@ -29,8 +29,8 @@ class ListingAdmin(admin.ModelAdmin):
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
     list_display = ('title', 'date_time', 'location', 'category', 'featured', 'created_at')
-    list_filter = ('featured', 'created_at')
-    search_fields = ('title', 'location', 'description')
+    list_filter = ('category', 'featured', 'created_at')
+    search_fields = ('title', 'location', 'description', 'category')
     list_editable = ('featured',)
     ordering = ('-created_at',)
 

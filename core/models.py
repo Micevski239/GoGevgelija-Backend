@@ -69,6 +69,7 @@ class Event(models.Model):
         ('food', 'Food'),
         ('nightlife', 'Nightlife'),
         ('outdoor', 'Outdoor'),
+        ('other', 'Other'),
     ]
     
     
