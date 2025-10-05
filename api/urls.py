@@ -19,6 +19,7 @@ urlpatterns = [
     path("api/health/", health),
     path("api/auth/register/", Register.as_view()),
     path("api/auth/me/", Me.as_view()),
+    path("api/auth/profile/", Me.as_view()),
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
 ]

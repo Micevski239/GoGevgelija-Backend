@@ -4,6 +4,7 @@ from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.response import Response
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Item, Category, Listing, Event, Promotion, Blog, EventJoin, Wishlist
 from .serializers import ItemSerializer, CategorySerializer, ListingSerializer, EventSerializer, PromotionSerializer, BlogSerializer, UserSerializer, WishlistSerializer, WishlistCreateSerializer
@@ -151,6 +152,43 @@ class Me(APIView):
     def get(self, request):
         u = request.user
         return Response({"id": u.id, "username": u.username, "email": u.email})
+    
+    def put(self, request):
+        """Update user profile"""
+        user = request.user
+        data = request.data
+        
+        # Update username if provided
+        if 'username' in data and data['username']:
+            # Check if username already exists
+            if User.objects.filter(username=data['username']).exclude(id=user.id).exists():
+                return Response(
+                    {"error": "Username already exists"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            user.username = data['username']
+        
+        # Handle password change if provided
+        if 'new_password' in data and data['new_password']:
+            # Verify current password if provided
+            if 'current_password' in data and data['current_password']:
+                if not user.check_password(data['current_password']):
+                    return Response(
+                        {"error": "Current password is incorrect"}, 
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            
+            # Set new password
+            user.set_password(data['new_password'])
+        
+        # Save user changes
+        user.save()
+        
+        return Response({
+            "id": user.id, 
+            "username": user.username, 
+            "email": user.email
+        })
 
 class WishlistViewSet(viewsets.ModelViewSet):
     serializer_class = WishlistSerializer
