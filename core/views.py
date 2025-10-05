@@ -41,6 +41,18 @@ class EventViewSet(viewsets.ModelViewSet):
         featured_events = Event.objects.filter(featured=True)
         serializer = self.get_serializer(featured_events, many=True)
         return Response(serializer.data)
+    
+    @action(detail=True, methods=['post'], permission_classes=[permissions.AllowAny])
+    def join(self, request, pk=None):
+        """Join an event (increment join count)"""
+        event = self.get_object()
+        event.join_count += 1
+        event.save()
+        serializer = self.get_serializer(event)
+        return Response({
+            'message': 'Successfully joined the event!',
+            'event': serializer.data
+        }, status=status.HTTP_200_OK)
 
 class PromotionViewSet(viewsets.ModelViewSet):
     queryset = Promotion.objects.all()
