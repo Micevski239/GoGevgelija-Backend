@@ -43,7 +43,7 @@ class PromotionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Promotion
         fields = [
-            "id", "title", "description", "discount_code", "tags", 
+            "id", "title", "description", "has_discount_code", "discount_code", "tags", 
             "image", "valid_until", "featured", "website", "facebook_url", 
             "instagram_url", "address", "created_at", "updated_at"
         ]
