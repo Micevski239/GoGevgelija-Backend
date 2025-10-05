@@ -62,12 +62,23 @@ class Listing(models.Model):
 
 
 class Event(models.Model):
+    CATEGORY_CHOICES = [
+        ('music', 'Music'),
+        ('sports', 'Sports'),
+        ('culture', 'Culture'),
+        ('food', 'Food'),
+        ('nightlife', 'Nightlife'),
+        ('outdoor', 'Outdoor'),
+    ]
+    
+    
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, help_text="Event description")
     date_time = models.CharField(max_length=100, help_text="e.g., 'Fri, 20:00' or 'Dec 25, 18:00'")
     location = models.CharField(max_length=255, help_text="Event venue/location")
     cover_image = models.URLField(max_length=1000, help_text="URL to the event cover image")
     entry_price = models.CharField(max_length=50, default="Free", help_text="Entry price (e.g., 'Free', '10 EUR', '500 MKD')")
+    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='other')
     age_limit = models.CharField(max_length=50, default="All ages welcome", help_text="Age restriction (e.g., 'All ages welcome', '18+', '21+')")
     expectations = models.JSONField(default=list, help_text="List of expectations with icons, e.g., [{'icon': 'musical-notes', 'text': 'Live entertainment'}, {'icon': 'restaurant', 'text': 'Food available'}]")
     featured = models.BooleanField(default=False, help_text="Show in featured events")
