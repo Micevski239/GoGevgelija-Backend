@@ -22,14 +22,16 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class ListingSerializer(serializers.ModelSerializer):
     title = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
     address = serializers.SerializerMethodField()
     open_time = serializers.SerializerMethodField()
+    tags = serializers.SerializerMethodField()
     
     class Meta:
         model = Listing
         fields = [
-            "id", "title", "rating", "address", "open_time", 
-            "category", "tags", "image", "phone_number", 
+            "id", "title", "description", "address", "open_time", 
+            "category", "tags", "working_hours", "image", "phone_number", 
             "facebook_url", "instagram_url", "website_url", 
             "featured", "created_at", "updated_at"
         ]
@@ -38,6 +40,10 @@ class ListingSerializer(serializers.ModelSerializer):
         language = self.context.get('language', 'en')
         return getattr(obj, f'title_{language}', obj.title_en or obj.title)
     
+    def get_description(self, obj):
+        language = self.context.get('language', 'en')
+        return getattr(obj, f'description_{language}', obj.description_en or obj.description)
+    
     def get_address(self, obj):
         language = self.context.get('language', 'en')
         return getattr(obj, f'address_{language}', obj.address_en or obj.address)
@@ -45,6 +51,12 @@ class ListingSerializer(serializers.ModelSerializer):
     def get_open_time(self, obj):
         language = self.context.get('language', 'en')
         return getattr(obj, f'open_time_{language}', obj.open_time_en or obj.open_time)
+    
+    def get_tags(self, obj):
+        language = self.context.get('language', 'en')
+        if language == 'mk' and obj.tags_mk:
+            return obj.tags_mk
+        return obj.tags
 
 class EventSerializer(serializers.ModelSerializer):
     has_joined = serializers.SerializerMethodField()

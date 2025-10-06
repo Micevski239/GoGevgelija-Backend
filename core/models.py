@@ -49,16 +49,16 @@ class Listing(models.Model):
     ]
     
     title = models.CharField(max_length=255)
-    rating = models.DecimalField(
-        max_digits=3, 
-        decimal_places=1, 
-        validators=[MinValueValidator(0.0), MaxValueValidator(5.0)],
-        default=0.0
-    )
+    description = models.TextField(blank=True, help_text="Listing description")
     address = models.CharField(max_length=500)
     open_time = models.CharField(max_length=100, help_text="e.g., 'Open until 23:00' or 'Mon-Fri 9:00-18:00'")
+    working_hours = models.JSONField(
+        default=dict, 
+        help_text="Working hours structure, e.g., {'monday': '09:00-18:00', 'tuesday': '09:00-18:00', ...}"
+    )
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='other')
     tags = models.JSONField(default=list, help_text="List of tags, e.g., ['Grill', 'Family', 'Outdoor']")
+    tags_mk = models.JSONField(default=list, help_text="List of tags in Macedonian, e.g., ['Скара', 'Семејно', 'Надворешно']")
     image = models.URLField(max_length=1000, help_text="URL to the listing image")
     phone_number = models.CharField(max_length=20, blank=True, null=True, help_text="Contact phone number")
     facebook_url = models.URLField(max_length=500, blank=True, null=True, help_text="Facebook page URL")
