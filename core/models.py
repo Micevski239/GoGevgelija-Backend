@@ -126,6 +126,7 @@ class Promotion(models.Model):
     valid_until = models.DateField(null=True, blank=True, help_text="Promotion expiry date")
     featured = models.BooleanField(default=False, help_text="Show in featured promotions")
     website = models.URLField(max_length=500, blank=True, help_text="Website URL")
+    phone_number = models.CharField(max_length=20, blank=True, null=True, help_text="Contact phone number")
     facebook_url = models.URLField(max_length=500, blank=True, help_text="Facebook page URL")
     instagram_url = models.URLField(max_length=500, blank=True, help_text="Instagram profile URL")
     address = models.CharField(max_length=500, blank=True, help_text="Physical address")
