@@ -56,6 +56,10 @@ class Listing(models.Model):
         default=dict, 
         help_text="Working hours structure, e.g., {'monday': '09:00-18:00', 'tuesday': '09:00-18:00', ...}"
     )
+    working_hours_mk = models.JSONField(
+        default=dict, 
+        help_text="Working hours in Macedonian, e.g., {'понedelник': '09:00-18:00', 'вторник': '09:00-18:00', ...}"
+    )
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='other')
     tags = models.JSONField(default=list, help_text="List of tags, e.g., ['Grill', 'Family', 'Outdoor']")
     tags_mk = models.JSONField(default=list, help_text="List of tags in Macedonian, e.g., ['Скара', 'Семејно', 'Надворешно']")

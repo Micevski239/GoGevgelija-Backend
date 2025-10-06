@@ -26,6 +26,7 @@ class ListingSerializer(serializers.ModelSerializer):
     address = serializers.SerializerMethodField()
     open_time = serializers.SerializerMethodField()
     tags = serializers.SerializerMethodField()
+    working_hours = serializers.SerializerMethodField()
     
     class Meta:
         model = Listing
@@ -57,6 +58,12 @@ class ListingSerializer(serializers.ModelSerializer):
         if language == 'mk' and obj.tags_mk:
             return obj.tags_mk
         return obj.tags
+    
+    def get_working_hours(self, obj):
+        language = self.context.get('language', 'en')
+        if language == 'mk' and obj.working_hours_mk:
+            return obj.working_hours_mk
+        return obj.working_hours
 
 class EventSerializer(serializers.ModelSerializer):
     has_joined = serializers.SerializerMethodField()
