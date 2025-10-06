@@ -70,6 +70,9 @@ class EventSerializer(serializers.ModelSerializer):
     title = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
     location = serializers.SerializerMethodField()
+    entry_price = serializers.SerializerMethodField()
+    age_limit = serializers.SerializerMethodField()
+    expectations = serializers.SerializerMethodField()
     
     class Meta:
         model = Event
@@ -95,6 +98,24 @@ class EventSerializer(serializers.ModelSerializer):
     def get_location(self, obj):
         language = self.context.get('language', 'en')
         return getattr(obj, f'location_{language}', obj.location_en or obj.location)
+    
+    def get_entry_price(self, obj):
+        language = self.context.get('language', 'en')
+        if language == 'mk' and obj.entry_price_mk:
+            return obj.entry_price_mk
+        return obj.entry_price
+    
+    def get_age_limit(self, obj):
+        language = self.context.get('language', 'en')
+        if language == 'mk' and obj.age_limit_mk:
+            return obj.age_limit_mk
+        return obj.age_limit
+    
+    def get_expectations(self, obj):
+        language = self.context.get('language', 'en')
+        if language == 'mk' and obj.expectations_mk:
+            return obj.expectations_mk
+        return obj.expectations
 
 class PromotionSerializer(serializers.ModelSerializer):
     title = serializers.SerializerMethodField()
