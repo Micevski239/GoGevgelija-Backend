@@ -1,7 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
-from .models import Item, Category, Listing, Event, Promotion, Blog, EventJoin, Wishlist
+from django.utils import translation
+from .models import Item, Category, Listing, Event, Promotion, Blog, EventJoin, Wishlist, UserProfile
 
 class ItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -9,11 +10,21 @@ class ItemSerializer(serializers.ModelSerializer):
         fields = ["id","name","created_at"]
 
 class CategorySerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    
     class Meta:
         model = Category
         fields = ["id", "name", "icon", "trending", "created_at"]
+    
+    def get_name(self, obj):
+        language = self.context.get('language', 'en')
+        return getattr(obj, f'name_{language}', obj.name_en or obj.name)
 
 class ListingSerializer(serializers.ModelSerializer):
+    title = serializers.SerializerMethodField()
+    address = serializers.SerializerMethodField()
+    open_time = serializers.SerializerMethodField()
+    
     class Meta:
         model = Listing
         fields = [
@@ -22,9 +33,24 @@ class ListingSerializer(serializers.ModelSerializer):
             "facebook_url", "instagram_url", "website_url", 
             "featured", "created_at", "updated_at"
         ]
+    
+    def get_title(self, obj):
+        language = self.context.get('language', 'en')
+        return getattr(obj, f'title_{language}', obj.title_en or obj.title)
+    
+    def get_address(self, obj):
+        language = self.context.get('language', 'en')
+        return getattr(obj, f'address_{language}', obj.address_en or obj.address)
+    
+    def get_open_time(self, obj):
+        language = self.context.get('language', 'en')
+        return getattr(obj, f'open_time_{language}', obj.open_time_en or obj.open_time)
 
 class EventSerializer(serializers.ModelSerializer):
     has_joined = serializers.SerializerMethodField()
+    title = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
+    location = serializers.SerializerMethodField()
     
     class Meta:
         model = Event
@@ -38,8 +64,24 @@ class EventSerializer(serializers.ModelSerializer):
         """Check if the current user has joined this event."""
         # TODO: Implement proper user join tracking when authentication is set up
         return False
+    
+    def get_title(self, obj):
+        language = self.context.get('language', 'en')
+        return getattr(obj, f'title_{language}', obj.title_en or obj.title)
+    
+    def get_description(self, obj):
+        language = self.context.get('language', 'en')
+        return getattr(obj, f'description_{language}', obj.description_en or obj.description)
+    
+    def get_location(self, obj):
+        language = self.context.get('language', 'en')
+        return getattr(obj, f'location_{language}', obj.location_en or obj.location)
 
 class PromotionSerializer(serializers.ModelSerializer):
+    title = serializers.SerializerMethodField()
+    description = serializers.SerializerMethodField()
+    address = serializers.SerializerMethodField()
+    
     class Meta:
         model = Promotion
         fields = [
@@ -47,8 +89,25 @@ class PromotionSerializer(serializers.ModelSerializer):
             "image", "valid_until", "featured", "website", "facebook_url", 
             "instagram_url", "address", "created_at", "updated_at"
         ]
+    
+    def get_title(self, obj):
+        language = self.context.get('language', 'en')
+        return getattr(obj, f'title_{language}', obj.title_en or obj.title)
+    
+    def get_description(self, obj):
+        language = self.context.get('language', 'en')
+        return getattr(obj, f'description_{language}', obj.description_en or obj.description)
+    
+    def get_address(self, obj):
+        language = self.context.get('language', 'en')
+        return getattr(obj, f'address_{language}', obj.address_en or obj.address)
 
 class BlogSerializer(serializers.ModelSerializer):
+    title = serializers.SerializerMethodField()
+    subtitle = serializers.SerializerMethodField()
+    content = serializers.SerializerMethodField()
+    author = serializers.SerializerMethodField()
+    
     class Meta:
         model = Blog
         fields = [
@@ -56,18 +115,45 @@ class BlogSerializer(serializers.ModelSerializer):
             "tags", "cover_image", "read_time_minutes", "featured", 
             "published", "created_at", "updated_at"
         ]
+    
+    def get_title(self, obj):
+        language = self.context.get('language', 'en')
+        return getattr(obj, f'title_{language}', obj.title_en or obj.title)
+    
+    def get_subtitle(self, obj):
+        language = self.context.get('language', 'en')
+        return getattr(obj, f'subtitle_{language}', obj.subtitle_en or obj.subtitle)
+    
+    def get_content(self, obj):
+        language = self.context.get('language', 'en')
+        return getattr(obj, f'content_{language}', obj.content_en or obj.content)
+    
+    def get_author(self, obj):
+        language = self.context.get('language', 'en')
+        return getattr(obj, f'author_{language}', obj.author_en or obj.author)
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = ["language_preference"]
 
 class UserSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
+    profile = UserProfileSerializer(read_only=True)
+    
     class Meta:
         model = User
-        fields = ["username", "email", "password"]
+        fields = ["id", "username", "email", "password", "profile"]
+    
     def create(self, validated_data):
-        return User.objects.create_user(
+        user = User.objects.create_user(
             username=validated_data["username"],
             email=validated_data.get("email",""),
             password=validated_data["password"],
         )
+        # Create user profile with default language
+        UserProfile.objects.create(user=user)
+        return user
 
 class WishlistSerializer(serializers.ModelSerializer):
     item_type = serializers.CharField(read_only=True)

@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Item, Category, Listing, Event, Promotion, Blog, EventJoin, Wishlist
-from .serializers import ItemSerializer, CategorySerializer, ListingSerializer, EventSerializer, PromotionSerializer, BlogSerializer, UserSerializer, WishlistSerializer, WishlistCreateSerializer
+from .models import Item, Category, Listing, Event, Promotion, Blog, EventJoin, Wishlist, UserProfile
+from .serializers import ItemSerializer, CategorySerializer, ListingSerializer, EventSerializer, PromotionSerializer, BlogSerializer, UserSerializer, WishlistSerializer, WishlistCreateSerializer, UserProfileSerializer
 
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all().order_by("-created_at")
@@ -18,11 +18,29 @@ class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [permissions.AllowAny]
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        # Get language from user profile or default to 'en'
+        language = 'en'
+        if self.request.user.is_authenticated and hasattr(self.request.user, 'profile'):
+            language = self.request.user.profile.language_preference
+        context['language'] = language
+        return context
 
 class ListingViewSet(viewsets.ModelViewSet):
     queryset = Listing.objects.all()
     serializer_class = ListingSerializer
     permission_classes = [permissions.AllowAny]
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        # Get language from user profile or default to 'en'
+        language = 'en'
+        if self.request.user.is_authenticated and hasattr(self.request.user, 'profile'):
+            language = self.request.user.profile.language_preference
+        context['language'] = language
+        return context
     
     @action(detail=False, methods=['get'])
     def featured(self, request):
@@ -35,6 +53,15 @@ class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
     serializer_class = EventSerializer
     permission_classes = [permissions.AllowAny]
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        # Get language from user profile or default to 'en'
+        language = 'en'
+        if self.request.user.is_authenticated and hasattr(self.request.user, 'profile'):
+            language = self.request.user.profile.language_preference
+        context['language'] = language
+        return context
     
     @action(detail=False, methods=['get'])
     def featured(self, request):
@@ -111,6 +138,15 @@ class PromotionViewSet(viewsets.ModelViewSet):
     serializer_class = PromotionSerializer
     permission_classes = [permissions.AllowAny]
     
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        # Get language from user profile or default to 'en'
+        language = 'en'
+        if self.request.user.is_authenticated and hasattr(self.request.user, 'profile'):
+            language = self.request.user.profile.language_preference
+        context['language'] = language
+        return context
+    
     @action(detail=False, methods=['get'])
     def featured(self, request):
         """Get only featured promotions"""
@@ -122,6 +158,15 @@ class BlogViewSet(viewsets.ModelViewSet):
     queryset = Blog.objects.filter(published=True)
     serializer_class = BlogSerializer
     permission_classes = [permissions.AllowAny]
+    
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        # Get language from user profile or default to 'en'
+        language = 'en'
+        if self.request.user.is_authenticated and hasattr(self.request.user, 'profile'):
+            language = self.request.user.profile.language_preference
+        context['language'] = language
+        return context
     
     @action(detail=False, methods=['get'])
     def featured(self, request):
@@ -188,6 +233,43 @@ class Me(APIView):
             "id": user.id, 
             "username": user.username, 
             "email": user.email
+        })
+
+class LanguageView(APIView):
+    """View for handling user language preferences"""
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get(self, request):
+        """Get current user's language preference"""
+        try:
+            profile = request.user.profile
+            return Response({'language': profile.language_preference})
+        except UserProfile.DoesNotExist:
+            # Create profile if it doesn't exist
+            profile = UserProfile.objects.create(user=request.user)
+            return Response({'language': profile.language_preference})
+    
+    def post(self, request):
+        """Update user's language preference"""
+        language = request.data.get('language')
+        
+        if language not in ['en', 'mk']:
+            return Response(
+                {'error': 'Invalid language. Must be "en" or "mk"'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            profile = request.user.profile
+        except UserProfile.DoesNotExist:
+            profile = UserProfile.objects.create(user=request.user)
+        
+        profile.language_preference = language
+        profile.save()
+        
+        return Response({
+            'message': 'Language preference updated successfully',
+            'language': language
         })
 
 class WishlistViewSet(viewsets.ModelViewSet):

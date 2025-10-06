@@ -1,6 +1,6 @@
 from django.contrib import admin
 # from modeltranslation.admin import TranslationAdmin
-from .models import Item, Category, Listing, Event, Promotion, Blog, test, EventJoin, Wishlist
+from .models import Item, Category, Listing, Event, Promotion, Blog, test, EventJoin, Wishlist, UserProfile
 
 @admin.register(test)
 class testAdmib(admin.ModelAdmin):
@@ -67,3 +67,11 @@ class WishlistAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'user__email')
     ordering = ('-created_at',)
     readonly_fields = ('created_at',)
+
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'language_preference', 'created_at', 'updated_at')
+    list_filter = ('language_preference', 'created_at')
+    search_fields = ('user__username', 'user__email')
+    ordering = ('-created_at',)
+    readonly_fields = ('created_at', 'updated_at')
