@@ -121,6 +121,7 @@ class PromotionSerializer(serializers.ModelSerializer):
     title = serializers.SerializerMethodField()
     description = serializers.SerializerMethodField()
     address = serializers.SerializerMethodField()
+    tags = serializers.SerializerMethodField()
     
     class Meta:
         model = Promotion
@@ -141,6 +142,12 @@ class PromotionSerializer(serializers.ModelSerializer):
     def get_address(self, obj):
         language = self.context.get('language', 'en')
         return getattr(obj, f'address_{language}', obj.address_en or obj.address)
+    
+    def get_tags(self, obj):
+        language = self.context.get('language', 'en')
+        if language == 'mk' and obj.tags_mk:
+            return obj.tags_mk
+        return obj.tags
 
 class BlogSerializer(serializers.ModelSerializer):
     title = serializers.SerializerMethodField()

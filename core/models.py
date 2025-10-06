@@ -121,6 +121,7 @@ class Promotion(models.Model):
     has_discount_code = models.BooleanField(default=False, help_text="Whether this promotion has a discount code")
     discount_code = models.CharField(max_length=50, blank=True, help_text="Promo code for discount (only used if has_discount_code is True)")
     tags = models.JSONField(default=list, help_text="List of tags, e.g., ['Today', 'Dine-in', '50% off']")
+    tags_mk = models.JSONField(default=list, help_text="List of tags in Macedonian, e.g., ['Денес', 'За јадење', '50% попуст']")
     image = models.URLField(max_length=1000, help_text="URL to the promotion image")
     valid_until = models.DateField(null=True, blank=True, help_text="Promotion expiry date")
     featured = models.BooleanField(default=False, help_text="Show in featured promotions")
