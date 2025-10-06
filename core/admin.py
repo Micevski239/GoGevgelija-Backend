@@ -1,4 +1,5 @@
 from django.contrib import admin
+from modeltranslation.admin import TranslationAdmin
 from .models import Item, Category, Listing, Event, Promotion, Blog, test, EventJoin, Wishlist
 
 @admin.register(test)
@@ -11,7 +12,7 @@ class ItemAdmin(admin.ModelAdmin):
     search_fields = ('name',)
 
 @admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
+class CategoryAdmin(TranslationAdmin):
     list_display = ('name', 'icon', 'trending', 'created_at')
     list_filter = ('trending', 'created_at')
     search_fields = ('name', 'icon')
@@ -19,7 +20,7 @@ class CategoryAdmin(admin.ModelAdmin):
     ordering = ('name',)
 
 @admin.register(Listing)
-class ListingAdmin(admin.ModelAdmin):
+class ListingAdmin(TranslationAdmin):
     list_display = ('title', 'category', 'rating', 'featured', 'created_at', 'phone_number', 'facebook_url', 'instagram_url', 'website_url')
     list_filter = ('category', 'featured', 'created_at')
     search_fields = ('title', 'address', 'category')
@@ -27,7 +28,7 @@ class ListingAdmin(admin.ModelAdmin):
     ordering = ('-created_at',)
 
 @admin.register(Event)
-class EventAdmin(admin.ModelAdmin):
+class EventAdmin(TranslationAdmin):
     list_display = ('title', 'date_time', 'location', 'category', 'featured', 'created_at')
     list_filter = ('category', 'featured', 'created_at')
     search_fields = ('title', 'location', 'description', 'category')
@@ -35,7 +36,7 @@ class EventAdmin(admin.ModelAdmin):
     ordering = ('-created_at',)
 
 @admin.register(Promotion)
-class PromotionAdmin(admin.ModelAdmin):
+class PromotionAdmin(TranslationAdmin):
     list_display = ('title', 'discount_code', 'valid_until', 'featured', 'created_at')
     list_filter = ('featured', 'valid_until', 'created_at')
     search_fields = ('title', 'discount_code', 'description')
@@ -43,7 +44,7 @@ class PromotionAdmin(admin.ModelAdmin):
     ordering = ('-created_at',)
 
 @admin.register(Blog)
-class BlogAdmin(admin.ModelAdmin):
+class BlogAdmin(TranslationAdmin):
     list_display = ('title', 'author', 'category', 'read_time_minutes', 'featured', 'published', 'created_at')
     list_filter = ('category', 'featured', 'published', 'created_at')
     search_fields = ('title', 'subtitle', 'content', 'author', 'category')

@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "corsheaders",
+    "modeltranslation",
     "core",
 ]
 
@@ -115,9 +116,16 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = os.getenv("DJANGO_SECURE_SSL_REDIRECT", "0") == "1"
 
 # -------- i18n
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "en"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
+
+LANGUAGES = [
+    ('en', 'English'),
+    ('mk', 'Macedonian'),
+]
+
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
