@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db import models
 from django.forms import Textarea
 # from modeltranslation.admin import TranslationAdmin
-from .models import Item, Category, Listing, Event, Promotion, Blog, test, EventJoin, Wishlist, UserProfile
+from .models import Item, Category, Listing, Event, Promotion, Blog, test, EventJoin, Wishlist, UserProfile, UserPermission
 
 class MultilingualAdminMixin:
     """Mixin for multilingual admin interfaces with tabbed layout"""
@@ -225,3 +225,31 @@ class UserProfileAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'user__email')
     ordering = ('-created_at',)
     readonly_fields = ('created_at', 'updated_at')
+
+@admin.register(UserPermission)
+class UserPermissionAdmin(admin.ModelAdmin):
+    list_display = ('user', 'listing', 'can_edit', 'granted_by', 'created_at')
+    list_filter = ('can_edit', 'created_at', 'granted_by')
+    search_fields = ('user__username', 'user__email', 'listing__title')
+    ordering = ('-created_at',)
+    readonly_fields = ('created_at', 'updated_at')
+    
+    fieldsets = (
+        ('Permission Details', {
+            'fields': ('user', 'listing', 'can_edit'),
+            'classes': ('wide',),
+        }),
+        ('Grant Information', {
+            'fields': ('granted_by',),
+            'classes': ('wide',),
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',),
+        }),
+    )
+    
+    def save_model(self, request, obj, form, change):
+        if not change:  # Only set granted_by when creating new permission
+            obj.granted_by = request.user
+        super().save_model(request, obj, form, change)
