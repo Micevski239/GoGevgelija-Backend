@@ -37,9 +37,18 @@ class ListingViewSet(viewsets.ModelViewSet):
         context = super().get_serializer_context()
         # Get language from user profile or default to 'en'
         language = 'en'
-        if self.request.user.is_authenticated and hasattr(self.request.user, 'profile'):
-            language = self.request.user.profile.language_preference
+        print(f"DEBUG ListingViewSet: User authenticated: {self.request.user.is_authenticated}")
+        if self.request.user.is_authenticated:
+            print(f"DEBUG ListingViewSet: Username: {self.request.user.username}")
+            if hasattr(self.request.user, 'profile'):
+                language = self.request.user.profile.language_preference
+                print(f"DEBUG ListingViewSet: User language preference: {language}")
+            else:
+                print("DEBUG ListingViewSet: User has no profile")
+        else:
+            print("DEBUG ListingViewSet: User not authenticated, using default language")
         context['language'] = language
+        print(f"DEBUG ListingViewSet: Final language context: {language}")
         return context
     
     @action(detail=False, methods=['get'])
