@@ -6,8 +6,8 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import Item, Category, Listing, Event, Promotion, Blog, EventJoin, Wishlist, UserProfile
-from .serializers import ItemSerializer, CategorySerializer, ListingSerializer, EventSerializer, PromotionSerializer, BlogSerializer, UserSerializer, WishlistSerializer, WishlistCreateSerializer, UserProfileSerializer
+from .models import Item, Category, Listing, Event, Promotion, Blog, EventJoin, Wishlist, UserProfile, UserPermission
+from .serializers import ItemSerializer, CategorySerializer, ListingSerializer, EventSerializer, PromotionSerializer, BlogSerializer, UserSerializer, WishlistSerializer, WishlistCreateSerializer, UserProfileSerializer, UserPermissionSerializer, CreateUserPermissionSerializer, EditListingSerializer
 
 class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all().order_by("-created_at")
@@ -378,3 +378,120 @@ class WishlistViewSet(viewsets.ModelViewSet):
         ).exists()
         
         return Response({"is_wishlisted": is_wishlisted}, status=status.HTTP_200_OK)
+
+
+class UserPermissionViewSet(viewsets.ModelViewSet):
+    """ViewSet for managing user permissions (admin only)."""
+    serializer_class = UserPermissionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        """Return all permissions. In production, add admin check here."""
+        return UserPermission.objects.all()
+    
+    def create(self, request, *args, **kwargs):
+        """Create a new user permission."""
+        serializer = CreateUserPermissionSerializer(data=request.data, context={'request': request})
+        serializer.is_valid(raise_exception=True)
+        permission = serializer.save()
+        
+        # Return the created permission using the main serializer
+        response_serializer = UserPermissionSerializer(permission)
+        return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+    
+    @action(detail=False, methods=['get'])
+    def by_user(self, request):
+        """Get permissions for a specific user."""
+        user_id = request.query_params.get('user_id')
+        if not user_id:
+            return Response(
+                {"error": "user_id parameter is required"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        permissions = UserPermission.objects.filter(user_id=user_id)
+        serializer = self.get_serializer(permissions, many=True)
+        return Response(serializer.data)
+    
+    @action(detail=False, methods=['get'])
+    def by_listing(self, request):
+        """Get permissions for a specific listing."""
+        listing_id = request.query_params.get('listing_id')
+        if not listing_id:
+            return Response(
+                {"error": "listing_id parameter is required"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        permissions = UserPermission.objects.filter(listing_id=listing_id)
+        serializer = self.get_serializer(permissions, many=True)
+        return Response(serializer.data)
+
+
+class EditListingView(APIView):
+    """View for editing listings (requires permission)."""
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get(self, request, listing_id):
+        """Get listing details for editing."""
+        try:
+            listing = Listing.objects.get(id=listing_id)
+        except Listing.DoesNotExist:
+            return Response(
+                {"error": "Listing not found"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Check if user has permission to edit this listing
+        if not UserPermission.objects.filter(
+            user=request.user, 
+            listing=listing, 
+            can_edit=True
+        ).exists():
+            return Response(
+                {"error": "You don't have permission to edit this listing"}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        serializer = EditListingSerializer(listing)
+        return Response(serializer.data)
+    
+    def patch(self, request, listing_id):
+        """Update listing (requires permission)."""
+        try:
+            listing = Listing.objects.get(id=listing_id)
+        except Listing.DoesNotExist:
+            return Response(
+                {"error": "Listing not found"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        # Check if user has permission to edit this listing
+        if not UserPermission.objects.filter(
+            user=request.user, 
+            listing=listing, 
+            can_edit=True
+        ).exists():
+            return Response(
+                {"error": "You don't have permission to edit this listing"}, 
+                status=status.HTTP_403_FORBIDDEN
+            )
+        
+        serializer = EditListingSerializer(listing, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        updated_listing = serializer.save()
+        
+        # Return the updated listing with full details
+        full_serializer = ListingSerializer(updated_listing, context={'request': request})
+        return Response(full_serializer.data)
+
+
+class AdminUsersView(APIView):
+    """View for getting all users (admin functionality)."""
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get(self, request):
+        """Get all users. In production, add admin check here."""
+        users = User.objects.all().order_by('username')
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)

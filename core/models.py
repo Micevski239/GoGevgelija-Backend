@@ -219,3 +219,23 @@ class Wishlist(models.Model):
     def item_data(self):
         """Return the actual data of the wishlisted item."""
         return self.content_object
+
+
+class UserPermission(models.Model):
+    """
+    Model to manage user permissions for editing specific listings.
+    Allows admins to grant editing rights to specific users for specific listings.
+    """
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='listing_permissions')
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE, related_name='user_permissions')
+    can_edit = models.BooleanField(default=True, help_text="Whether user can edit this listing")
+    granted_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='granted_permissions', help_text="Admin who granted this permission")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ('user', 'listing')
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.user.username} can edit {self.listing.title}"

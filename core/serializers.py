@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.utils import translation
-from .models import Item, Category, Listing, Event, Promotion, Blog, EventJoin, Wishlist, UserProfile
+from .models import Item, Category, Listing, Event, Promotion, Blog, EventJoin, Wishlist, UserProfile, UserPermission
 
 class ItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -27,6 +27,7 @@ class ListingSerializer(serializers.ModelSerializer):
     open_time = serializers.SerializerMethodField()
     tags = serializers.SerializerMethodField()
     working_hours = serializers.SerializerMethodField()
+    can_edit = serializers.SerializerMethodField()
     
     class Meta:
         model = Listing
@@ -34,7 +35,7 @@ class ListingSerializer(serializers.ModelSerializer):
             "id", "title", "description", "address", "open_time", 
             "category", "tags", "working_hours", "image", "phone_number", 
             "facebook_url", "instagram_url", "website_url", 
-            "featured", "created_at", "updated_at"
+            "featured", "created_at", "updated_at", "can_edit"
         ]
     
     def get_title(self, obj):
@@ -64,6 +65,19 @@ class ListingSerializer(serializers.ModelSerializer):
         if language == 'mk' and obj.working_hours_mk:
             return obj.working_hours_mk
         return obj.working_hours
+    
+    def get_can_edit(self, obj):
+        """Check if the current user has permission to edit this listing."""
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return False
+        
+        # Check if user has permission to edit this specific listing
+        return UserPermission.objects.filter(
+            user=request.user,
+            listing=obj,
+            can_edit=True
+        ).exists()
 
 class EventSerializer(serializers.ModelSerializer):
     has_joined = serializers.SerializerMethodField()
@@ -262,3 +276,61 @@ class WishlistCreateSerializer(serializers.Serializer):
             raise serializers.ValidationError("Item is already in wishlist.")
         
         return wishlist_item
+
+
+class UserPermissionSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    listing = ListingSerializer(read_only=True)
+    granted_by = UserSerializer(read_only=True)
+    
+    class Meta:
+        model = UserPermission
+        fields = ["id", "user", "listing", "can_edit", "granted_by", "created_at", "updated_at"]
+
+
+class CreateUserPermissionSerializer(serializers.Serializer):
+    """Serializer for creating user permissions."""
+    user_id = serializers.IntegerField()
+    listing_id = serializers.IntegerField()
+    can_edit = serializers.BooleanField(default=True)
+    
+    def create(self, validated_data):
+        granted_by = self.context['request'].user
+        
+        # Get the user and listing
+        try:
+            user = User.objects.get(id=validated_data['user_id'])
+            listing = Listing.objects.get(id=validated_data['listing_id'])
+        except (User.DoesNotExist, Listing.DoesNotExist):
+            raise serializers.ValidationError("User or Listing does not exist.")
+        
+        # Create or update the permission
+        permission, created = UserPermission.objects.update_or_create(
+            user=user,
+            listing=listing,
+            defaults={
+                'can_edit': validated_data['can_edit'],
+                'granted_by': granted_by
+            }
+        )
+        
+        return permission
+
+
+class EditListingSerializer(serializers.ModelSerializer):
+    """Serializer for editing listings - only includes editable fields."""
+    
+    class Meta:
+        model = Listing
+        fields = [
+            "title", "description", "address", "open_time", 
+            "working_hours", "category", "tags", "phone_number", 
+            "facebook_url", "instagram_url", "website_url"
+        ]
+    
+    def update(self, instance, validated_data):
+        """Update listing with validation."""
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
