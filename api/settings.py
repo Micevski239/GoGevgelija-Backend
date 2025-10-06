@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "modeltranslation",
-    "core",
+    "core.apps.CoreConfig",
 ]
 
 # -------- Middleware
@@ -127,5 +127,8 @@ LANGUAGES = [
 ]
 
 MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'
+
+# Import translation configuration
+import core.translation
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
