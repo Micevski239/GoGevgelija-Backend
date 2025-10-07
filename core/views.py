@@ -203,9 +203,14 @@ class Register(APIView):
         }, status = status.HTTP_201_CREATED)
 
 class Me(APIView):
+    permission_classes = [permissions.AllowAny]
+    
     def get(self, request):
-        u = request.user
-        return Response({"id": u.id, "username": u.username, "email": u.email})
+        if request.user.is_authenticated:
+            u = request.user
+            return Response({"id": u.id, "username": u.username, "email": u.email})
+        else:
+            return Response({"id": None, "username": None, "email": None, "authenticated": False})
     
     def put(self, request):
         """Update user profile"""
