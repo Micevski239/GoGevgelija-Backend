@@ -318,19 +318,51 @@ class CreateUserPermissionSerializer(serializers.Serializer):
 
 
 class EditListingSerializer(serializers.ModelSerializer):
-    """Serializer for editing listings - only includes editable fields."""
+    """Serializer for editing listings - includes bilingual fields."""
+    
+    # Let django-modeltranslation handle the bilingual fields automatically
+    # Just define the extra fields that aren't auto-generated
+    working_hours_mk = serializers.JSONField(required=False)
+    tags_mk = serializers.ListField(required=False, allow_empty=True)
     
     class Meta:
         model = Listing
         fields = [
-            "title", "description", "address", "open_time", 
+            # Base fields (non-translatable)
             "working_hours", "category", "tags", "phone_number", 
-            "facebook_url", "instagram_url", "website_url"
+            "facebook_url", "instagram_url", "website_url",
+            # Bilingual fields
+            "title_en", "title_mk", "description_en", "description_mk",
+            "address_en", "address_mk", "open_time_en", "open_time_mk",
+            "working_hours_mk", "tags_mk"
         ]
     
+    def to_representation(self, instance):
+        """Include current bilingual field values in response."""
+        data = super().to_representation(instance)
+        
+        # Add current values for bilingual fields with proper None handling
+        data['title_en'] = getattr(instance, 'title_en', None) or ''
+        data['title_mk'] = getattr(instance, 'title_mk', None) or ''
+        data['description_en'] = getattr(instance, 'description_en', None) or ''
+        data['description_mk'] = getattr(instance, 'description_mk', None) or ''
+        data['address_en'] = getattr(instance, 'address_en', None) or ''
+        data['address_mk'] = getattr(instance, 'address_mk', None) or ''
+        data['open_time_en'] = getattr(instance, 'open_time_en', None) or ''
+        data['open_time_mk'] = getattr(instance, 'open_time_mk', None) or ''
+        data['working_hours_mk'] = getattr(instance, 'working_hours_mk', None) or {}
+        data['tags_mk'] = getattr(instance, 'tags_mk', None) or []
+        
+        return data
+    
     def update(self, instance, validated_data):
-        """Update listing with validation."""
+        """Update listing with validation for bilingual fields."""
+        print(f"=== EditListingSerializer.update ===")
+        print(f"Validated data: {validated_data}")
         for attr, value in validated_data.items():
+            print(f"Setting {attr} = {value}")
             setattr(instance, attr, value)
         instance.save()
+        print(f"Instance saved. Title EN: {getattr(instance, 'title_en', 'N/A')}")
+        print(f"Instance saved. Title MK: {getattr(instance, 'title_mk', 'N/A')}")
         return instance
