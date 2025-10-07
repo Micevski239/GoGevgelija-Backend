@@ -15,7 +15,6 @@ router.register(r"wishlist", WishlistViewSet, basename="wishlist")
 router.register(r"admin/permissions", UserPermissionViewSet, basename="permissions")
 
 urlpatterns = [
-    path('', admin.site.urls),
     path('api/', include(router.urls)),
     path("api/health/", health),
     path("api/auth/register/", Register.as_view()),
@@ -26,4 +25,6 @@ urlpatterns = [
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/listings/<int:listing_id>/edit/", EditListingView.as_view(), name="edit_listing"),
     path("api/admin/users/", AdminUsersView.as_view(), name="admin_users"),
+    path('admin/', admin.site.urls),
+    path('', admin.site.urls),  # Keep admin as fallback for root
 ]
