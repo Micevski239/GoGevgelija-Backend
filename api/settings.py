@@ -20,9 +20,12 @@ CSRF_TRUSTED_ORIGINS = os.getenv(
     "CSRF_TRUSTED_ORIGINS",
     "https://gogevgelija.com,https://www.gogevgelija.com,https://admin.gogevgelija.com,http://167.71.37.168"
 ).split(",")
-SECURE_PROXY_SSL_HEADER = None
-CSRF_COOKIE_SECURE = False
-SESSION_COOKIE_SECURE = False
+
+# Security settings for HTTPS
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = not DEBUG
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
 
 
 
@@ -107,17 +110,17 @@ STORAGES = {
 }
 
 # -------- CORS
-# Default: locked. Set CORS_ALLOWED_ORIGINS in env when apps are live.
+# Default: allow common origins. Set CORS_ALLOWED_ORIGINS in env for production.
 CORS_ALLOW_ALL_ORIGINS = os.getenv("CORS_ALLOW_ALL_ORIGINS", "0") == "1"
 if not CORS_ALLOW_ALL_ORIGINS:
-    _cors_env = os.getenv("CORS_ALLOWED_ORIGINS", "")
-    CORS_ALLOWED_ORIGINS = [o for o in _cors_env.split(",") if o]
+    _cors_env = os.getenv("CORS_ALLOWED_ORIGINS", "https://admin.gogevgelija.com,https://gogevgelija.com,https://www.gogevgelija.com")
+    CORS_ALLOWED_ORIGINS = [o.strip() for o in _cors_env.split(",") if o.strip()]
 
 # -------- Security / proxy
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-# Keep off until you enable HTTPS with Certbot, then set env DJANGO_SECURE_SSL_REDIRECT=1
-SECURE_SSL_REDIRECT = os.getenv("DJANGO_SECURE_SSL_REDIRECT", "0") == "1"
+# Enable SSL redirect for production (when not in DEBUG mode)
+SECURE_SSL_REDIRECT = not DEBUG and os.getenv("DJANGO_SECURE_SSL_REDIRECT", "1") == "1"
 
 # -------- i18n
 LANGUAGE_CODE = "en"
