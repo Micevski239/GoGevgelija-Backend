@@ -13,12 +13,12 @@ DEFAULT_IP = "167.71.37.168"
 
 ALLOWED_HOSTS = os.getenv(
     "ALLOWED_HOSTS",
-    f"localhost,127.0.0.1,{DEFAULT_IP},gogevgelija.com,www.gogevgelija.com"
+    f"localhost,127.0.0.1,{DEFAULT_IP},gogevgelija.com,www.gogevgelija.com,admin.gogevgelija.com"
 ).split(",")
 
 CSRF_TRUSTED_ORIGINS = os.getenv(
     "CSRF_TRUSTED_ORIGINS",
-    "https://gogevgelija.com,https://www.gogevgelija.com,http://167.71.37.168"
+    "https://gogevgelija.com,https://www.gogevgelija.com,https://admin.gogevgelija.com,http://167.71.37.168"
 ).split(",")
 SECURE_PROXY_SSL_HEADER = None
 CSRF_COOKIE_SECURE = False
