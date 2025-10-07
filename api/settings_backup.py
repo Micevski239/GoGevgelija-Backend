@@ -27,6 +27,8 @@ SESSION_COOKIE_SECURE = not DEBUG
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
+
+
 # -------- Apps
 INSTALLED_APPS = [
     "django.contrib.admin",
