@@ -15,7 +15,7 @@ router.register(r"wishlist", WishlistViewSet, basename="wishlist")
 router.register(r"admin/permissions", UserPermissionViewSet, basename="permissions")
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('', admin.site.urls),
     path('api/', include(router.urls)),
     path("api/health/", health),
     path("api/auth/register/", Register.as_view()),
