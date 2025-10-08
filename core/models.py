@@ -37,18 +37,6 @@ class Category(models.Model):
         return self.name
 
 class Listing(models.Model):
-    CATEGORY_CHOICES = [
-        ('restaurant', 'Restaurant'),
-        ('restaurants', 'Restaurants'),
-        ('cafe', 'Cafe'),
-        ('bar', 'Bar'),
-        ('hotel', 'Hotel'),
-        ('shop', 'Shop'),
-        ('service', 'Service'),
-        ('attraction', 'Attraction'),
-        ('other', 'Other'),
-    ]
-    
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, help_text="Listing description")
     address = models.CharField(max_length=500)
@@ -61,7 +49,7 @@ class Listing(models.Model):
         default=dict, 
         help_text="Working hours in Macedonian, e.g., {'понedelник': '09:00-18:00', 'вторник': '09:00-18:00', ...}"
     )
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='other')
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, help_text="Select category from available categories")
     tags = models.JSONField(default=list, help_text="List of tags, e.g., ['Grill', 'Family', 'Outdoor']")
     tags_mk = models.JSONField(default=list, help_text="List of tags in Macedonian, e.g., ['Скара', 'Семејно', 'Надворешно']")
     image = models.URLField(max_length=1000, help_text="URL to the listing image")

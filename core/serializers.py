@@ -28,6 +28,7 @@ class ListingSerializer(serializers.ModelSerializer):
     tags = serializers.SerializerMethodField()
     working_hours = serializers.SerializerMethodField()
     can_edit = serializers.SerializerMethodField()
+    category = CategorySerializer(read_only=True)
     
     class Meta:
         model = Listing

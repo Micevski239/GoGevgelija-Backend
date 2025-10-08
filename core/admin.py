@@ -87,7 +87,7 @@ class CategoryAdmin(admin.ModelAdmin):
 class ListingAdmin(MultilingualAdminMixin, admin.ModelAdmin):
     list_display = ('title', 'category', 'featured', 'created_at', 'phone_number')
     list_filter = ('category', 'featured', 'created_at')
-    search_fields = ('title', 'address', 'category')
+    search_fields = ('title', 'address', 'category__name')
     list_editable = ('featured',)
     ordering = ('-created_at',)
     
