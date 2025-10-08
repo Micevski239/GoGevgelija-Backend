@@ -14,7 +14,7 @@ class CategorySerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Category
-        fields = ["id", "name", "icon", "trending", "created_at"]
+        fields = ["id", "name", "icon", "image_url", "trending", "created_at"]
     
     def get_name(self, obj):
         language = self.context.get('language', 'en')
@@ -88,6 +88,7 @@ class EventSerializer(serializers.ModelSerializer):
     entry_price = serializers.SerializerMethodField()
     age_limit = serializers.SerializerMethodField()
     expectations = serializers.SerializerMethodField()
+    category = CategorySerializer(read_only=True)
     
     class Meta:
         model = Event

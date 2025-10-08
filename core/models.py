@@ -26,6 +26,7 @@ class Item(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=50, unique=True)
     icon = models.CharField(max_length=50, help_text="Ionicon name (e.g., 'restaurant-outline')")
+    image_url = models.URLField(max_length=1000, blank=True, null=True, help_text="Optional category image URL")
     trending = models.BooleanField(default=False, help_text="Show as trending category")
     created_at = models.DateTimeField(auto_now_add=True)
     
@@ -69,17 +70,6 @@ class Listing(models.Model):
 
 
 class Event(models.Model):
-    CATEGORY_CHOICES = [
-        ('music', 'Music'),
-        ('sports', 'Sports'),
-        ('culture', 'Culture'),
-        ('food', 'Food'),
-        ('nightlife', 'Nightlife'),
-        ('outdoor', 'Outdoor'),
-        ('other', 'Other'),
-    ]
-    
-    
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True, help_text="Event description")
     date_time = models.CharField(max_length=100, help_text="e.g., 'Fri, 20:00' or 'Dec 25, 18:00'")
@@ -87,7 +77,7 @@ class Event(models.Model):
     cover_image = models.URLField(max_length=1000, help_text="URL to the event cover image")
     entry_price = models.CharField(max_length=50, default="Free", help_text="Entry price (e.g., 'Free', '10 EUR', '500 MKD')")
     entry_price_mk = models.CharField(max_length=50, blank=True, help_text="Entry price in Macedonian (e.g., 'Бесплатно', '10 ЕУР', '500 МКД')")
-    category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='other')
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, help_text="Select category from available categories")
     age_limit = models.CharField(max_length=50, default="All ages welcome", help_text="Age restriction (e.g., 'All ages welcome', '18+', '21+')")
     age_limit_mk = models.CharField(max_length=50, blank=True, help_text="Age restriction in Macedonian (e.g., 'Добредојдени се сите возрасти', '18+', '21+')")
     expectations = models.JSONField(default=list, help_text="List of expectations with icons, e.g., [{'icon': 'musical-notes', 'text': 'Live entertainment'}, {'icon': 'restaurant', 'text': 'Food available'}]")
