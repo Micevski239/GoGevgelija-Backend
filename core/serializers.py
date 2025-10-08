@@ -98,8 +98,11 @@ class EventSerializer(serializers.ModelSerializer):
     
     def get_has_joined(self, obj):
         """Check if the current user has joined this event."""
-        # TODO: Implement proper user join tracking when authentication is set up
-        return False
+        request = self.context.get('request')
+        if not request or not request.user.is_authenticated:
+            return False
+        from .models import EventJoin
+        return EventJoin.objects.filter(event=obj, user=request.user).exists()
     
     def get_title(self, obj):
         language = self.context.get('language', 'en')
@@ -357,12 +360,7 @@ class EditListingSerializer(serializers.ModelSerializer):
     
     def update(self, instance, validated_data):
         """Update listing with validation for bilingual fields."""
-        print(f"=== EditListingSerializer.update ===")
-        print(f"Validated data: {validated_data}")
         for attr, value in validated_data.items():
-            print(f"Setting {attr} = {value}")
             setattr(instance, attr, value)
         instance.save()
-        print(f"Instance saved. Title EN: {getattr(instance, 'title_en', 'N/A')}")
-        print(f"Instance saved. Title MK: {getattr(instance, 'title_mk', 'N/A')}")
         return instance

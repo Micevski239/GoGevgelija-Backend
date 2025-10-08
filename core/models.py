@@ -39,6 +39,7 @@ class Category(models.Model):
 class Listing(models.Model):
     CATEGORY_CHOICES = [
         ('restaurant', 'Restaurant'),
+        ('restaurants', 'Restaurants'),
         ('cafe', 'Cafe'),
         ('bar', 'Bar'),
         ('hotel', 'Hotel'),
@@ -171,10 +172,6 @@ class Blog(models.Model):
     def __str__(self):
         return self.title
     
-class test(models.Model):
-    title = models.CharField(max_length=100)
-    def __str__(self):
-        return self.title
 
 
 class EventJoin(models.Model):

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db import models
 from django.forms import Textarea
 # from modeltranslation.admin import TranslationAdmin
-from .models import Item, Category, Listing, Event, Promotion, Blog, test, EventJoin, Wishlist, UserProfile, UserPermission
+from .models import Item, Category, Listing, Event, Promotion, Blog, EventJoin, Wishlist, UserProfile, UserPermission
 
 class MultilingualAdminMixin:
     """Mixin for multilingual admin interfaces with tabbed layout"""
@@ -69,9 +69,6 @@ class MultilingualAdminMixin:
     
     actions = ['copy_en_to_mk', 'clear_mk_content']
 
-@admin.register(test)
-class testAdmib(admin.ModelAdmin):
-    list_display = ('title',)
 
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
