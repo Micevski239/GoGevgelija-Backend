@@ -88,8 +88,4 @@ class Migration(migrations.Migration):
             old_name='category_new',
             new_name='category',
         ),
-        # Delete the test model
-        migrations.DeleteModel(
-            name='test',
-        ),
     ]
