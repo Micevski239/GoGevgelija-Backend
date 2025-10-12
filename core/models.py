@@ -3,6 +3,28 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
+import uuid
+
+class GuestUser(models.Model):
+    """
+    Model for anonymous guest users who can browse but not use account-based features.
+    Each guest gets a unique guest_id that can be used to identify their session.
+    """
+    guest_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_active = models.DateTimeField(auto_now=True)
+    language_preference = models.CharField(
+        max_length=2,
+        choices=[('en', 'English'), ('mk', 'Macedonian')],
+        default='en',
+        help_text="Guest's preferred language"
+    )
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Guest {self.guest_id}"
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')

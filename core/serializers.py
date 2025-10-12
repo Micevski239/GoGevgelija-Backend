@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.utils import translation
-from .models import Item, Category, Listing, Event, Promotion, Blog, EventJoin, Wishlist, UserProfile, UserPermission
+from .models import Item, Category, Listing, Event, Promotion, Blog, EventJoin, Wishlist, UserProfile, UserPermission, GuestUser
 
 class ItemSerializer(serializers.ModelSerializer):
     class Meta:
@@ -198,6 +198,12 @@ class BlogSerializer(serializers.ModelSerializer):
         language = self.context.get('language', 'en')
         return getattr(obj, f'author_{language}', obj.author_en or obj.author)
 
+class GuestUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GuestUser
+        fields = ["guest_id", "language_preference", "created_at", "last_active"]
+        read_only_fields = ["guest_id", "created_at", "last_active"]
+
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
@@ -323,10 +329,6 @@ class CreateUserPermissionSerializer(serializers.Serializer):
 
 
 class EditListingSerializer(serializers.ModelSerializer):
-    """Serializer for editing listings - includes bilingual fields."""
-    
-    # Let django-modeltranslation handle the bilingual fields automatically
-    # Just define the extra fields that aren't auto-generated
     working_hours_mk = serializers.JSONField(required=False)
     tags_mk = serializers.ListField(required=False, allow_empty=True)
     
